@@ -187,6 +187,7 @@ export default class Pagination<TData> extends PureComponent<PaginationProps<TDa
             accessible={!!accessibilityLabel}
             accessibilityLabel={accessibilityLabel}
           >
+              {/* @ts-ignore */}
               {this.dots}
           </View>
       );

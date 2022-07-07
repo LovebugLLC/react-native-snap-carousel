@@ -13,7 +13,6 @@ import {
     GestureResponderEvent,
     ViewStyle
 } from 'react-native';
-import shallowCompare from 'react-addons-shallow-compare';
 import {
     defaultScrollInterpolator,
     stackScrollInterpolator,
@@ -175,16 +174,16 @@ export class Carousel<TData> extends React.Component<
       }, 1);
   }
 
-  shouldComponentUpdate (
-      nextProps: CarouselProps<TData>,
-      nextState: CarouselState
-  ): boolean {
-      if (this.props.shouldOptimizeUpdates === false) {
-          return true;
-      } else {
-          return shallowCompare(this, nextProps, nextState);
-      }
-  }
+  // shouldComponentUpdate (
+  //     nextProps: CarouselProps<TData>,
+  //     nextState: CarouselState
+  // ): boolean {
+  //     if (this.props.shouldOptimizeUpdates === false) {
+  //         return true;
+  //     } else {
+  //         return shallowCompare(this, nextProps, nextState);
+  //     }
+  // }
 
   componentDidUpdate (prevProps: CarouselProps<TData>) {
       const { interpolators } = this.state;
@@ -645,6 +644,7 @@ export class Carousel<TData> extends React.Component<
 
       return (
           <View style={cellStyle} key={index} {...props}>
+              {/* @ts-ignore */}
               {children}
           </View>
       );
@@ -1160,6 +1160,7 @@ export class Carousel<TData> extends React.Component<
             pointerEvents='box-none'
             {...specificProps}
           >
+              {/* @ts-ignore */}
               {this.props.vertical ? this.props.renderItem({ item, index, dataIndex }, {
                   scrollPosition: this._scrollPos,
                   carouselRef: this._carouselRef,
@@ -1218,7 +1219,7 @@ export class Carousel<TData> extends React.Component<
       };
   }
 
-  _getComponentStaticProps () {
+  _getComponentStaticProps (): CarouselProps<TData> {
       const { hideCarousel } = this.state;
       const {
           activeSlideAlignment,
@@ -1289,13 +1290,16 @@ export class Carousel<TData> extends React.Component<
           } :
           {};
 
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const ref = (c: any) => {
+          this._carouselRef = c as FlatList<TData> | ScrollView;
+      }
+
       return {
           ...specificProps,
           ...snapProps,
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          ref: (c: any) => {
-              this._carouselRef = c as FlatList<TData> | ScrollView;
-          },
+          // @ts-ignore
+          ref,
           contentContainerStyle: contentContainerStyle,
           data: this._getCustomData(),
           horizontal: !this.props.vertical,
@@ -1326,6 +1330,7 @@ export class Carousel<TData> extends React.Component<
       typeof useScrollView === 'function' ? useScrollView : Animated.ScrollView;
 
       return this._needsScrollView() || !Animated.FlatList ? (
+              /* @ts-ignore */
           <ScrollViewComponent {...props}>
               {this._getCustomData().map((item, index) => {
                   return this._renderItem({ item, index });
